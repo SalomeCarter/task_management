@@ -65,12 +65,17 @@ public class UserController {
         if (sessionUser.isPresent()){
             httpSession.setAttribute("sessionUser", sessionUser.get());
 
-//            !!!Изменить путь на главную страницу, когда будет готов контроллер!!!
-            return "goalsList";
+            return "redirect:/goals";
         } else {
             model.addAttribute("loginInvalid", "Email or password is invalid, please try again");
             return "login";
         }
+    }
+
+    @GetMapping("/logout")
+    public String logout(HttpSession httpSession) {
+        httpSession.invalidate();
+        return "redirect:/user/login";
     }
 
 }

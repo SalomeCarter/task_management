@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>All tasks by goal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp" crossorigin="anonymous">
+    <style>
+
+        /* Styles for goal name */
+        .goal-name {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        /* Styles for existing tasks */
+        .task-card {
+            border-radius: 10px;
+            border: 1px solid #d1d1d1;
+            background-color: #f2f2f2;
+            height: 200px;
+        }
+
+        .task-card-header {
+            padding: 8px;
+            background-color: #d1d1d1;
+            font-weight: bold;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .task-card-body {
+            padding: 10px;
+        }
+
+        .task-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .task-description {
+            margin-bottom: 5px;
+        }
+
+        .task-status,
+        .task-priority {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .task-date {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .btn-custom {
+            background-color: white;
+            color: black;
+            font-weight: bold;
+            border-color: black;
+            border-width: 2px;
+            display: inline-block;
+            padding: 6px 12px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn-outline-black {
+            background-color: transparent;
+            color: black;
+            border-color: black;
+            border-width: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-light" style="background-color: #CCD1D1;">
+    <div class="container">
+        <a class="navbar-brand" th:href="@{/goals}">
+            <img src="/images/logo.png" alt="logo" width="100" height="50">
+        </a>
+        <a th:href="@{/user/logout}" class="btn btn-dark">Log Out</a>
+    </div>
+</nav>
+
+<!-- Goal Name -->
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <h2 class="goal-name" th:text="${goal.name}">Goal name: </h2>
+        </div>
+    </div>
+</div>
+
+<!-- "Add new task" button -->
+<p class="fs-6"></p>
+<div class="d-grid gap-2 col-6 mx-auto">
+    <a th:href="@{/goals/{goalName}/add-task(goalName=${goal.name})}" class="btn btn-custom btn-outline-black">Add new task</a>
+</div>
+
+<!-- Existing Tasks by Goal -->
+<div class="container mt-4">
+
+
+        <!-- Filter Options -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="d-flex justify-content-center mb-3">
+                <div class="dropdown me-3">
+                    <button class="btn btn-secondary dropdown-toggle custom-filter-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Status
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" th:href="@{/goals/{goalName}/status/DONE}" th:classappend="${status == 'DONE'}">Done</a></li>
+                        <li><a class="dropdown-item" th:href="@{/goals/{goalName}/status/IN_PROGRESS}" th:classappend="${status == 'IN_PROGRESS'}">In Progress</a></li>
+                        <li><a class="dropdown-item" th:href="@{/goals/{goalName}/status/CANCELED}" th:classappend="${status == 'CANCELED'}">Canceled</a></li>
+                        <li><a class="dropdown-item" th:href="@{/goals/{goalName}/status/BACKLOG}" th:classappend="${status == 'BACKLOG'}">Backlog</a></li>
+                    </ul>
+                </div>
+
+                <div class="dropdown me-3">
+                    <button class="btn btn-secondary dropdown-toggle custom-filter-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Priority
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" th:href="@{/goals/{goalName}/priority/NO_PRIORITY}" th:classappend="${priority == 'NO_PRIORITY'}">No priority</a></li>
+                        <li><a class="dropdown-item" th:href="@{/goals/{goalName}/priority/URGENT}" th:classappend="${priority == 'URGENT'}">Urgent</a></li>
+                        <li><a class="dropdown-item" th:href="@{/goals/{goalName}/priority/HIGH}" th:classappend="${priority == 'HIGH'}">High</a></li>
+                        <li><a class="dropdown-item" th:href="@{/goals/{goalName}/priority/MEDIUM}" th:classappend="${priority == 'MEDIUM'}">Medium</a></li>
+                        <li><a class="dropdown-item" th:href="@{/goals/{goalName}/priority/LOW}" th:classappend="${priority == 'LOW'}">Low</a></li>
+                    </ul>
+                </div>
+
+                <div class="dropdown me-3">
+                    <button class="btn btn-secondary dropdown-toggle custom-filter-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Date
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" th:href="@{/goals/{goalName}/date-asc}">Ascending</a></li>
+                        <li><a class="dropdown-item" th:href="@{/goals/{goalName}/date-desc}">Descending</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row" th:each="task : ${tasks}">
+        <div class="col-md-4 mx-auto">
+            <div class="task-card mb-3">
+                <div class="task-card-header">
+                    Task
+                </div>
+                <div class="task-card-body">
+                    <p class="task-title" th:text="${task.header}">Task Title</p>
+                    <p class="task-description" th:text="${task.description}">Task Description</p>
+                    <p class="task-status" th:text="${task.status}">Status</p>
+                    <p class="task-priority" th:text="${task.priority}">Priority</p>
+                    <p class="task-date text-end" th:text="${task.createdAt}"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N"
+        crossorigin="anonymous"></script>
+</body>
+</html>

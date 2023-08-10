@@ -23,7 +23,6 @@ public class UserService {
         User user = RegUserDtoMapper.regUserToUser(regUserDto);
         userRepository.save(user);
     }
-
     public Optional<SessionUser> login(LoginUserDto loginUserDto) {
         Optional<User> user = userRepository.findByEmail(loginUserDto.getEmail());
         if (user.isPresent()) {
@@ -34,8 +33,4 @@ public class UserService {
         }
         return Optional.empty();
     }
-
-
-
-
 }

@@ -9,19 +9,25 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @Controller
 @RequestMapping("/goals")
 public class GoalController {
-
     @Autowired
     private GoalService goalService;
-
-    @PostMapping("/add-goal")   //хз какой здесь путь
+    @PostMapping("/add-goal")
     public String saveGoal(@ModelAttribute Goal goal) {
         goalService.save(goal);
-        return "tasksList";
+        String goalName = goal.getName();
+        return "redirect:/goals/" + goalName;
     }
+
+    @GetMapping("/add-goal")
+    public String showGoalForm(Model model) {
+        Goal goal = new Goal();
+        model.addAttribute("goal", goal);
+        return "add-goal";
+    }
+
 
     @GetMapping
     public String listGoals(Model model) {
@@ -39,6 +45,5 @@ public class GoalController {
         }
         return "goalsList";
     }
-
 
 }

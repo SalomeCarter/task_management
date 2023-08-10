@@ -33,7 +33,6 @@ public class GoalService {
         return goalRepository.findAll();
     }
 
-
     public Goal findByGoalName(String goalName) {
         Optional<Goal> goalOptional = goalRepository.findByName(goalName);
         return goalOptional.orElse(null);

@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,13 +26,10 @@ public class Task {
 
     private String description;
 
-
     private LocalDate createdAt;
-
 
     @Enumerated(EnumType.STRING)
     private Status status;
-
 
     @Enumerated(EnumType.STRING)
     private Priority priority;
@@ -42,13 +40,10 @@ public class Task {
     @ManyToOne(cascade = CascadeType.ALL)
     private Goal goal;
 
-    @ElementCollection
-    private List<byte[]> photos;
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    private List<Attachment> attachments = new ArrayList<>();
 
-    @ElementCollection
-    private List<String> comments = new ArrayList<>();
-
-    @ElementCollection
-    private List<String> fileAttachments = new ArrayList<>();
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL)
+    private List<Comment> comments = new ArrayList<>();
 
 }
