@@ -1,7 +1,6 @@
 package com.example.task_management.service;
 
 import com.example.task_management.entity.Goal;
-import com.example.task_management.entity.Task;
 import com.example.task_management.repo.GoalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,45 +8,55 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @Service
 @Transactional
 public class GoalService {
+    private static final Logger log = Logger.getLogger(GoalService.class.getName());
 
     @Autowired
     private GoalRepository goalRepository;
 
-    public void save(Goal goal) {
-        goalRepository.save(goal);
+    public Optional<Goal> updateGoal(Goal updatedGoal) {
+        Optional<Goal> byId = goalRepository.findById(updatedGoal.getId());
+        if (byId.isPresent()) {
+            goalRepository.save(updatedGoal);
+            return Optional.of(updatedGoal);
+        }
+        return Optional.empty();
     }
 
-    public List<Goal> findByUser(long id){
-        return goalRepository.findByUserId(id);
+
+    public void save(Goal goal) {
+        goalRepository.save(goal);
+        log.log(Level.INFO, "Goal saved " + goal.getName());
+    }
+
+    public List<Goal> findByUser(long id) {
+        List<Goal> goals = goalRepository.findByUserId(id);
+        return goals;
     }
 
     public void delete(Goal goal) {
         goalRepository.delete(goal);
+        log.log(Level.INFO, "Goal deleted " + goal.getName());
     }
 
     public List<Goal> getAllGoals() {
-        return goalRepository.findAll();
+        List<Goal> goals = goalRepository.findAll();
+        return goals;
     }
 
     public Goal findByGoalName(String goalName) {
         Optional<Goal> goalOptional = goalRepository.findByName(goalName);
-        return goalOptional.orElse(null);
+        if (goalOptional.isPresent()) {
+            Goal goal = goalOptional.get();
+            return goal;
+        } else {
+            return null;
+        }
     }
-
-    //Нужен ли этот метод? Можно просто сделать ссылкой
-//    public boolean addTask(long id, Task task) {
-//        Goal goal = goalRepository.findById(id).orElse(null);
-//        if (goal != null) {
-//            goal.getTasks().add(task);
-//            goalRepository.save(goal);
-//            return true;
-//        }
-//        return false;
-//    }
-
-
 }
+

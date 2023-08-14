@@ -38,23 +38,25 @@
             <p><strong>Status:</strong> <span th:text="${task.status}">In Progress</span></p>
             <p><strong>Priority:</strong> <span th:text="${task.priority}">High</span></p>
             <p><strong>Attachments:</strong></p>
-            <ul>
+            <ul th:if="${not #lists.isEmpty(task.attachments)}">
                 <li th:each="attachmentInfo : ${task.attachments}">
                     <a th:href="@{/goals/{goalName}/{taskId}/download/{attachmentId}(goalName=${task.goal.goalName}, taskId=${task.id}, attachmentId=${attachmentInfo.id})}">
                         <span th:text="${attachmentInfo.fileName}"></span>
                     </a>
                 </li>
             </ul>
+            <p th:unless="${not #lists.isEmpty(task.attachments)}">No files to download</p>
         </div>
     </div>
 </div>
+
 
 <!-- Add Attachment Section -->
 <div class="container mt-4">
     <div class="card bg-light">
         <div class="card-body">
             <h2 class="card-title">Add Attachment</h2>
-            <form th:action="@{/goals/{goalName}/{taskId}/add-attachment}" method="post" enctype="multipart/form-data">
+            <form th:action="@{/goals/{goalName}/{taskId}/upload}" method="post" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label for="file" class="form-label">Attach Files</label>
                     <input type="file" class="form-control" id="file" name="file" multiple>

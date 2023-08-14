@@ -18,6 +18,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,6 +44,7 @@ public class TaskController {
 
     @Autowired
     private AttachmentService attachmentService;
+
 
     @GetMapping("/{goalName}/add-task")
     public String showAddTaskForm(@PathVariable String goalName, Model model) {
@@ -108,21 +110,19 @@ public class TaskController {
         }
     }
 
+
     @GetMapping("/{goalName}/{taskId}/download/{attachmentId}")
     public void downloadAttachment(
             @PathVariable String goalName,
             @PathVariable Long taskId,
             @PathVariable Long attachmentId,
             HttpServletResponse response) throws IOException {
-
         Optional<Task> taskOptional = taskService.findById(taskId);
         if (taskOptional.isPresent()) {
             Task task = taskOptional.get();
-
             Optional<Attachment> attachmentOptional = task.getAttachments().stream()
                     .filter(attachment -> attachment.getId().equals(attachmentId))
                     .findFirst();
-
             if (attachmentOptional.isPresent()) {
                 Attachment attachment = attachmentOptional.get();
                 String resourcePath = "static/download/" + attachment.getFilePath();
@@ -144,18 +144,24 @@ public class TaskController {
         }
     }
 
+    @GetMapping("/{goalName}/{taskId}/upload") public String displayUploadForm(
+            @PathVariable String goalName,
+            @PathVariable Long taskId) {
+        return "task"; //<-- верный ли путь
+    }
 
-    @PostMapping("/{goalName}/{taskId}/add-attachment")
+    @PostMapping("/{goalName}/{taskId}/upload")
     public String addAttachmentToTask(
             @PathVariable String goalName,
             @PathVariable Long taskId,
-            @ModelAttribute("attachment") Attachment attachment) {
+            @ModelAttribute("attachment") Attachment attachment,
+            @RequestParam("file") MultipartFile file) {
 
         Optional<Task> taskOptional = taskService.findById(taskId);
         if (taskOptional.isPresent()) {
             Task task = taskOptional.get();
 
-            String fileName = attachment.getFileName();
+            String fileName = file.getOriginalFilename();
 
             String uploadDir = "static/upload/";
             String filePath = uploadDir + fileName;
@@ -165,6 +171,9 @@ public class TaskController {
                 if (!Files.exists(uploadPath)) {
                     Files.createDirectories(uploadPath);
                 }
+                Files.write(Paths.get(filePath), file.getBytes());
+
+                attachment.setFileName(fileName);
                 attachment.setFilePath(filePath);
                 attachment.setTask(task);
 
@@ -179,6 +188,7 @@ public class TaskController {
             return "taskNotFound";
         }
     }
+
 
     @GetMapping("/{goalName}")
     public String tasksList(@PathVariable String goalName, Model model) {
